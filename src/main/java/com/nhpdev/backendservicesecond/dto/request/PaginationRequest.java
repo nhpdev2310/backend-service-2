@@ -12,8 +12,8 @@ import lombok.*;
 @Builder
 public class PaginationRequest {
     @Min(1) @Builder.Default
-    int page = AppConstants.DEFAULT_PAGE;
+    int pageNumber = AppConstants.DEFAULT_PAGE;
 
     @Min(1) @Max(100) @Builder.Default
-    int size = AppConstants.DEFAULT_SIZE;
+    int pageSize = AppConstants.DEFAULT_SIZE;
 }

@@ -3,12 +3,19 @@ package com.nhpdev.backendservicesecond.service.impl;
 import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
+import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
 import com.nhpdev.backendservicesecond.entity.User;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
+import com.nhpdev.backendservicesecond.repository.specification.UserSpecification;
 import com.nhpdev.backendservicesecond.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.jpa.domain.PredicateSpecification;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -36,12 +43,28 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest, String email, String displayName, UserStatus status) {
-        return null;
+    public PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest, String email, String displayName) {
+        Pageable pageable = PageRequest.of(
+                pageRequest.getPageNumber() - 1,
+                pageRequest.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "createdAt")
+        );
+
+        PredicateSpecification<User> spec = PredicateSpecification.allOf(
+            UserSpecification.hasEmail(email),
+            UserSpecification.hasDisplayName(displayName)
+        );
+
+        Page<UserDetailResponse> userPage = userRepository.findBy(
+                spec,
+                q -> q.page(pageable))
+                .map(UserDetailResponse::of);
+        return PageResponse.of(userPage);
     }
 
     @Override
     public UserDetailResponse getUserById(String userId) {
-        return null;
+        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User is not exist!"));
+        return UserDetailResponse.of(user);
     }
 }

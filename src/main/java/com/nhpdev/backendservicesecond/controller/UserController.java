@@ -29,10 +29,14 @@ public class UserController {
     public ApiResponse<PageResponse<UserDetailResponse>> getAllUser(
             @ModelAttribute @Valid PaginationRequest pageRequest,
             @RequestParam(required = false) String email,
-            @RequestParam(required = false) String displayName,
-            @RequestParam(required = false) UserStatus status
+            @RequestParam(required = false) String displayName
     ) {
-        return ApiResponse.success(userService.getAllUser(pageRequest, email, displayName, status));
+        return ApiResponse.success(userService.getAllUser(pageRequest, email, displayName));
+    }
+
+    @GetMapping("/{id}")
+    public ApiResponse<UserDetailResponse> getUserById(@PathVariable("id") String userId) {
+        return ApiResponse.success(userService.getUserById(userId));
     }
 
 }

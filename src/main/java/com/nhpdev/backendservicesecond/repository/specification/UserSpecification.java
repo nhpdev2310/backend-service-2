@@ -1,18 +1,24 @@
 package com.nhpdev.backendservicesecond.repository.specification;
 
+import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
 import com.nhpdev.backendservicesecond.entity.User;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.data.jpa.domain.PredicateSpecification;
-import org.springframework.data.jpa.domain.Specification;
 
 public class UserSpecification {
     public static PredicateSpecification<User> hasEmail(String email) {
-        return (from, builder) ->
+        return (from, cb) ->
             StringUtils.isBlank(email) ? null
-            : builder.like(builder.lower(from.get("email")), "%" + email.toLowerCase() + "%");
+            : cb.like(cb.lower(from.get("email")), "%" + email.toLowerCase() + "%");
     }
 
-    public static Specification<User> hasDisplayName(String displayName) {
-        return (root, query, criteriaBuilder) ->
+    public static PredicateSpecification<User> hasDisplayName(String displayName) {
+        return (from, cb) -> StringUtils.isBlank(displayName) ? null
+                : cb.like(cb.lower(from.get("displayName")), "%" + displayName.toLowerCase() + "%");
+    }
+
+    public static PredicateSpecification<User> hasStatus(UserStatus status) {
+        return (from, cb) -> status == null ? null
+            : cb.equal(from.get("status"), status);
     }
 }
