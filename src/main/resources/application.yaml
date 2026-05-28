@@ -1,0 +1,6 @@
+kind: Application
+spring:
+  application:
+    name: backend-service-second
+  profiles:
+    active: dev

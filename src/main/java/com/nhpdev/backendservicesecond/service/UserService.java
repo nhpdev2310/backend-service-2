@@ -1,0 +1,15 @@
+package com.nhpdev.backendservicesecond.service;
+
+import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
+import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
+import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
+import com.nhpdev.backendservicesecond.dto.response.PageResponse;
+import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
+import org.springframework.data.jpa.domain.Specification;
+
+public interface UserService {
+    UserDetailResponse createUser(UserCreateRequest request);
+    PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest,
+                                                String email, String displayName, UserStatus status);
+    UserDetailResponse getUserById(String userId);
+}
