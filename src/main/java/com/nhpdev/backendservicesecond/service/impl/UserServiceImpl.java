@@ -1,9 +1,8 @@
 package com.nhpdev.backendservicesecond.service.impl;
 
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
+import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
-import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
 import com.nhpdev.backendservicesecond.entity.User;

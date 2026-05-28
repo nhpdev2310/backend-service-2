@@ -10,5 +10,6 @@ public class JacksonConfig {
     @Bean
     JsonMapperBuilderCustomizer jacksonCustomizer() {
         return builder -> builder.disable(DateTimeFeature.WRITE_DATES_AS_TIMESTAMPS);
+        //To disable auto serialize Instant by jacksonCustomizer (default)
     }
 }

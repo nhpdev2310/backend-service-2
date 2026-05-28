@@ -1,7 +1,9 @@
 package com.nhpdev.backendservicesecond.common.constraint;
 
 public final class AppConstants {
-    private AppConstants() {};
+    private AppConstants() {
+        throw new UnsupportedOperationException("Utility class");
+    }
 
     public static final int DEFAULT_PAGE = 1;
     public static final int DEFAULT_SIZE = 5;

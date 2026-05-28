@@ -1,6 +1,5 @@
 package com.nhpdev.backendservicesecond.service;
 
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;

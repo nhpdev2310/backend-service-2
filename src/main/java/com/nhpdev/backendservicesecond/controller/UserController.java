@@ -1,7 +1,6 @@
 package com.nhpdev.backendservicesecond.controller;
 
 import com.nhpdev.backendservicesecond.common.constraint.AppConstants;
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
@@ -10,7 +9,6 @@ import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
 import com.nhpdev.backendservicesecond.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -38,5 +36,4 @@ public class UserController {
     public ApiResponse<UserDetailResponse> getUserById(@PathVariable("id") String userId) {
         return ApiResponse.success(userService.getUserById(userId));
     }
-
 }

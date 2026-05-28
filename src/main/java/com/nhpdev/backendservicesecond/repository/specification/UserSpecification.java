@@ -1,11 +1,14 @@
 package com.nhpdev.backendservicesecond.repository.specification;
 
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
+import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import com.nhpdev.backendservicesecond.entity.User;
 import io.micrometer.common.util.StringUtils;
 import org.springframework.data.jpa.domain.PredicateSpecification;
 
 public class UserSpecification {
+    private UserSpecification() {
+        throw new UnsupportedOperationException("Utility class");
+    }
     public static PredicateSpecification<User> hasEmail(String email) {
         return (from, cb) ->
             StringUtils.isBlank(email) ? null

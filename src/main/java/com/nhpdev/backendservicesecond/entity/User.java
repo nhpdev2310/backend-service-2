@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.entity;
 
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
+import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import jakarta.persistence.*;
 import lombok.*;
 

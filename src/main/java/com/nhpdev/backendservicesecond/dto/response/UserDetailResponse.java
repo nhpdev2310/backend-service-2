@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.dto.response;
 
-import com.nhpdev.backendservicesecond.common.nhpEnum.UserStatus;
+import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import com.nhpdev.backendservicesecond.entity.User;
 import lombok.Builder;
 
