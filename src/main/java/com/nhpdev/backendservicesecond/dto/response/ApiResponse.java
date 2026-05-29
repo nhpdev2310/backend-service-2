@@ -23,18 +23,28 @@ public class ApiResponse <T> {
 
     // GET — 200
     public static <T> ApiResponse<T> success(T data) {
+        return success(data, null);
+    }
+
+    public static <T> ApiResponse<T> success(T data, String message) {
         return ApiResponse.<T>builder()
                 .data(data)
                 .status(HttpStatus.OK.value())
+                .message(message)
                 .timestamp(Instant.now())
                 .build();
     }
 
     // POST — 201
     public static <T> ApiResponse<T> created(T data) {
+        return created(data, null);
+    }
+
+    public static <T> ApiResponse<T> created(T data, String message) {
         return ApiResponse.<T>builder()
                 .data(data)
                 .status(HttpStatus.CREATED.value())
+                .message(message)
                 .timestamp(Instant.now())
                 .build();
     }

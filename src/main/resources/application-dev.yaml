@@ -23,6 +23,16 @@ spring:
     ansi:
       enabled: always
 
+jwt:
+  access_token:
+    secret: ${ACCESS_KEY}
+    expiration: 1
+  refresh_token:
+    secret: ${REFRESH_KEY}
+    expiration: 14
+  issuer: http://localhost:8080
+  audience: backend-service
+
 logging:
   level:
     org.hibernate.SQL: DEBUG

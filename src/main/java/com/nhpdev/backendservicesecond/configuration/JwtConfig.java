@@ -1,0 +1,32 @@
+package com.nhpdev.backendservicesecond.configuration;
+
+import lombok.Getter;
+import lombok.Setter;
+import lombok.experimental.Accessors;
+import org.springframework.boot.context.properties.ConfigurationProperties;
+import org.springframework.context.annotation.Configuration;
+
+@Configuration
+@ConfigurationProperties(prefix = "jwt")
+@Getter
+@Setter
+public class JwtConfig {
+    private String issuer;
+    private String audience;
+    private AccessToken accessToken;
+    private RefreshToken refreshToken;
+
+    @Getter
+    @Setter
+    public static class AccessToken {
+        private String secret;
+        private long expiration;
+    }
+
+    @Getter
+    @Setter
+    public static class RefreshToken {
+        private String secret;
+        private long expiration;
+    }
+}

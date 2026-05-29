@@ -15,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.PredicateSpecification;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -23,6 +24,7 @@ import org.springframework.transaction.annotation.Transactional;
 @Transactional(readOnly = true)
 public class UserServiceImpl implements UserService {
     private final UserRepository userRepository;
+    private final PasswordEncoder passwordEncoder;
 
     @Override
     @Transactional
@@ -34,7 +36,7 @@ public class UserServiceImpl implements UserService {
         User user = User.builder()
                 .email(request.email())
                 .displayName(request.displayName())
-                .password(request.password())
+                .password(passwordEncoder.encode(request.password()))
                 .status(UserStatus.INACTIVE)
                 .build();
         User savedUser = userRepository.save(user);
