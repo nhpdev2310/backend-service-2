@@ -93,4 +93,13 @@ public class JwtServiceImpl implements JwtService {
         return signedJWT;
     }
 
+    @Override
+    public List<String> extractAuthorities(Object authoritiesClaims) {
+        if (authoritiesClaims == null)
+            return List.of();
+        else if(authoritiesClaims instanceof List<?> list) {
+            return list.stream().map(String::valueOf).toList();
+        }
+        return List.of();
+    }
 }

@@ -3,7 +3,9 @@ server:
 
 spring:
   config:
-    import: optional:file:.env.dev[.properties]
+    import:
+      - optional:file:.env.dev[.properties]
+      - classpath:init-data/init_data.yaml
 
   datasource:
     url: ${DB_URL}
@@ -19,6 +21,10 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
   output:
     ansi:
       enabled: always
@@ -37,3 +43,5 @@ logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.stat: DEBUG
+    org.hibernate.orm.jdbc.batch: TRACE

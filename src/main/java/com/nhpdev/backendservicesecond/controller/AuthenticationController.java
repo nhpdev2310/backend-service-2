@@ -5,11 +5,8 @@ import com.nhpdev.backendservicesecond.dto.request.AuthenticationRequest;
 import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
 import com.nhpdev.backendservicesecond.dto.response.AuthenticationResponse;
 import com.nhpdev.backendservicesecond.service.AuthenticationService;
-import com.nimbusds.jose.JOSEException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
-
-import java.text.ParseException;
 
 @RestController
 @RequiredArgsConstructor

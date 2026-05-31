@@ -4,7 +4,8 @@ import com.nhpdev.backendservicesecond.entity.User;
 import jakarta.validation.constraints.NotBlank;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -14,4 +15,11 @@ public interface UserRepository extends JpaRepository<User, String>, JpaSpecific
     boolean existsUsersByEmail(@NotBlank(message = "email is required") String email);
     boolean existsUsersByDisplayName(String displayName);
     Optional<User> getUserByEmail(String email);
+    @Query("""
+            SELECT u FROM User u
+            LEFT JOIN FETCH u.userHasRoles uhr
+            LEFT JOIN FETCH uhr.role
+            WHERE u.email = :email
+        """)
+    Optional<User> getUserByEmailForSecurity(@Param("email") String email);
 }
