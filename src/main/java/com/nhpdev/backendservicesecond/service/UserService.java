@@ -10,4 +10,5 @@ public interface UserService {
     PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest,
                                                 String email, String displayName);
     UserDetailResponse getUserById(String userId);
+    UserDetailResponse myInfo(String userId);
 }

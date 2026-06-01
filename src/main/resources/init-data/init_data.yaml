@@ -1,0 +1,37 @@
+init-data:
+  roles:
+    - name: "SUPER_ADMIN"
+      description: "Super administrator - manage roles and permissions only"
+      permissions:
+        - "role:read"
+        - "role:update"
+        - "permission:read"
+        - "permission:update"
+
+    - name: "ADMIN"
+      description: "Administrator - manage users only"
+      permissions:
+        - "user:read"
+        - "user:create"
+        - "user:update"
+        - "user:delete"
+
+    - name: "AUTHOR"
+      description: "Author with content management access"
+      permissions:
+
+
+    - name: "MEMBER"
+      description: "Member with read only access"
+      permissions:
+
+
+  admin:
+    email: "admin@admin.com"
+    display-name: "Administrator"
+    password: "Admin@123"
+
+  super_admin:
+    email: "superadmin@admin.com"
+    display-name: "super Administrator"
+    password: "Superadmin@123"

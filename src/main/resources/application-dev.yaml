@@ -3,7 +3,9 @@ server:
 
 spring:
   config:
-    import: optional:file:.env.dev[.properties]
+    import:
+      - optional:file:.env.dev[.properties]
+      - classpath:init-data/init_data.yaml
 
   datasource:
     url: ${DB_URL}
@@ -19,11 +21,28 @@ spring:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
   output:
     ansi:
       enabled: always
+
+jwt:
+  access_token:
+    secret: ${ACCESS_KEY}
+    expiration: 1
+  refresh_token:
+    secret: ${REFRESH_KEY}
+    expiration: 14
+  issuer: http://localhost:8080
+  audience: backend-service
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.stat: DEBUG
+    org.hibernate.orm.jdbc.batch: TRACE
+    com.nhpdev.backendservicesecond: DEBUG

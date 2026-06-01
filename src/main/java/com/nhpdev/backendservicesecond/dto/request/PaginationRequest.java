@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.dto.request;
 
-import com.nhpdev.backendservicesecond.common.constraint.AppConstants;
+import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import lombok.*;
@@ -11,9 +11,9 @@ import lombok.*;
 @AllArgsConstructor
 @Builder
 public class PaginationRequest {
-    @Min(1) @Builder.Default
+    @Min(value = 1, message = "INVALID_INPUT") @Builder.Default
     int pageNumber = AppConstants.DEFAULT_PAGE;
 
-    @Min(1) @Max(100) @Builder.Default
+    @Min(value = 1, message = "INVALID_INPUT") @Max(value = 100, message = "INVALID_INPUT") @Builder.Default
     int pageSize = AppConstants.DEFAULT_SIZE;
 }
