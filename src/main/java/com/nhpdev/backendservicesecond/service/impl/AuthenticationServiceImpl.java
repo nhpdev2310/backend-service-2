@@ -3,7 +3,11 @@ package com.nhpdev.backendservicesecond.service.impl;
 import com.nhpdev.backendservicesecond.common.nhpenum.TokenType;
 import com.nhpdev.backendservicesecond.dto.request.AuthenticationRequest;
 import com.nhpdev.backendservicesecond.dto.response.AuthenticationResponse;
+import com.nhpdev.backendservicesecond.entity.Role;
 import com.nhpdev.backendservicesecond.entity.User;
+import com.nhpdev.backendservicesecond.entity.UserHasRole;
+import com.nhpdev.backendservicesecond.exception.BackendServiceException;
+import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.service.AuthenticationService;
 import com.nhpdev.backendservicesecond.service.JwtService;
@@ -15,7 +19,6 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
@@ -37,7 +40,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                 new UsernamePasswordAuthenticationToken(request.email(), request.password());
         Authentication authenticate = authenticationManager.authenticate(authenticationToken);
         if (!(authenticate.getPrincipal() instanceof User user)) {
-            throw new UsernameNotFoundException("User not found");
+            throw new BackendServiceException(ErrorCode.USER_NOT_FOUND);
         }
         Set<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                 .collect(Collectors.toSet());
@@ -46,6 +49,10 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         return AuthenticationResponse.builder()
                 .accessToken(accessToken)
                 .refreshToken(refreshToken)
+                .displayName(user.getDisplayName())
+                .roles(user.getUserHasRoles().stream().map(UserHasRole::getRole)
+                        .map(Role::getName)
+                        .collect(Collectors.toSet()))
                 .build();
     }
 
@@ -55,7 +62,7 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             SignedJWT signedJWT = jwtService.validateToken(refreshToken, TokenType.REFRESH);
             String userId = signedJWT.getJWTClaimsSet().getSubject();
             User user = userRepository.findById(userId).
-                    orElseThrow(() -> new RuntimeException("Token is invalid"));
+                    orElseThrow(() -> new BackendServiceException(ErrorCode.TOKEN_INVALID));
             Set<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
                     .collect(Collectors.toSet());
             String newAccessToken = jwtService.generateAccessToken(userId, authorities);

@@ -19,13 +19,12 @@ init-data:
     - name: "AUTHOR"
       description: "Author with content management access"
       permissions:
-        - "user:read"
-        - "user:update"
+
 
     - name: "MEMBER"
       description: "Member with read only access"
       permissions:
-        - "user:read"
+
 
   admin:
     email: "admin@admin.com"

@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.configuration;
 
-import com.nhpdev.backendservicesecond.common.constraint.JwtConstants;
+import com.nhpdev.backendservicesecond.constraint.JwtConstants;
 import com.nhpdev.backendservicesecond.dto.response.RoleDetailResponse;
 import com.nhpdev.backendservicesecond.service.JwtService;
 import com.nhpdev.backendservicesecond.service.RoleService;

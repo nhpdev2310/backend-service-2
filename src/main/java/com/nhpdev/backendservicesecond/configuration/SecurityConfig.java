@@ -1,6 +1,8 @@
 package com.nhpdev.backendservicesecond.configuration;
 
-import com.nhpdev.backendservicesecond.common.constraint.AppConstants;
+import com.nhpdev.backendservicesecond.constraint.AppConstants;
+import com.nhpdev.backendservicesecond.exception.JwtAccessDeniedHandler;
+import com.nhpdev.backendservicesecond.exception.JwtAuthenticationEntryPoint;
 import com.nhpdev.backendservicesecond.security.NhpJWTDecoder;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
@@ -9,6 +11,7 @@ import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
@@ -21,6 +24,7 @@ import org.springframework.security.web.SecurityFilterChain;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 @RequiredArgsConstructor
 public class SecurityConfig {
     private static final String URL_PREFIX = AppConstants.URL_PREFIX;
@@ -36,7 +40,7 @@ public class SecurityConfig {
     private final NhpJWTDecoder jwtDecoder;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()
@@ -47,15 +51,16 @@ public class SecurityConfig {
                     .sessionCreationPolicy(SessionCreationPolicy.STATELESS))
             .oauth2ResourceServer(oauth -> oauth
                     .jwt(jwtConfigurer -> jwtConfigurer.decoder(jwtDecoder))
-//                    .authenticationEntryPoint()
+                    .authenticationEntryPoint(new JwtAuthenticationEntryPoint())
+                    .accessDeniedHandler(new JwtAccessDeniedHandler())
             );
         return http.build();
     }
 
     @Bean
-    public JwtAuthenticationConverter jwtAuthenticationConverter(CustomJwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter) {
+    public JwtAuthenticationConverter jwtAuthenticationConverter(CustomJwtGrantedAuthoritiesConverter converter) {
         JwtAuthenticationConverter jwtAuthenticationConverter = new JwtAuthenticationConverter();
-        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(jwtGrantedAuthoritiesConverter);
+        jwtAuthenticationConverter.setJwtGrantedAuthoritiesConverter(converter);
         return jwtAuthenticationConverter;
     }
 

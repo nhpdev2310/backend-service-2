@@ -1,4 +1,4 @@
-package com.nhpdev.backendservicesecond.common.constraint;
+package com.nhpdev.backendservicesecond.constraint;
 
 public final class JwtConstants {
     private JwtConstants() {}

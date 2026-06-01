@@ -46,8 +46,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Builder.Default
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)
-
-    private transient Set<UserHasRole> userHasRoles = new HashSet<>();
+    private Set<UserHasRole> userHasRoles = new HashSet<>();
 
     public void addRole(Role role) {
         UserHasRole userHasRole = UserHasRole.builder()

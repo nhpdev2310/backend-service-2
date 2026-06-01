@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.controller;
 
-import com.nhpdev.backendservicesecond.common.constraint.AppConstants;
+import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
@@ -9,6 +9,8 @@ import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
 import com.nhpdev.backendservicesecond.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -19,7 +21,7 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping("")
-    public ApiResponse<UserDetailResponse> createUser(@Valid  @RequestBody UserCreateRequest request) {
+    public ApiResponse<UserDetailResponse> createUser(@Valid @RequestBody UserCreateRequest request) {
         return ApiResponse.created(userService.createUser(request));
     }
 
@@ -32,8 +34,16 @@ public class UserController {
         return ApiResponse.success(userService.getAllUser(pageRequest, email, displayName));
     }
 
+
     @GetMapping("/{id}")
     public ApiResponse<UserDetailResponse> getUserById(@PathVariable("id") String userId) {
         return ApiResponse.success(userService.getUserById(userId));
+    }
+
+    @GetMapping("/me")
+    public ApiResponse<UserDetailResponse> myInfo(@AuthenticationPrincipal Jwt jwt) {
+        var userId = jwt.getSubject();
+        var data = userService.myInfo(userId);
+        return ApiResponse.success(data);
     }
 }

@@ -1,6 +1,6 @@
 package com.nhpdev.backendservicesecond.security;
 
-import com.nhpdev.backendservicesecond.common.constraint.JwtConstants;
+import com.nhpdev.backendservicesecond.constraint.JwtConstants;
 import com.nhpdev.backendservicesecond.configuration.JwtConfig;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;

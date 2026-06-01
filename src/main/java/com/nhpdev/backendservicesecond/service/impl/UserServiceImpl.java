@@ -1,11 +1,15 @@
 package com.nhpdev.backendservicesecond.service.impl;
 
+import com.nhpdev.backendservicesecond.common.PermissionCode;
 import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
+import com.nhpdev.backendservicesecond.entity.Permission;
 import com.nhpdev.backendservicesecond.entity.User;
+import com.nhpdev.backendservicesecond.exception.BackendServiceException;
+import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.repository.specification.UserSpecification;
 import com.nhpdev.backendservicesecond.service.UserService;
@@ -15,6 +19,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.PredicateSpecification;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -30,9 +35,9 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public UserDetailResponse createUser(UserCreateRequest request) {
         if (userRepository.existsUsersByEmail(request.email()))
-            throw new RuntimeException("Email is already exist");
+            throw new BackendServiceException(ErrorCode.USER_ALREADY_EXISTS);
         if(userRepository.existsUsersByDisplayName(request.displayName()))
-            throw new RuntimeException("DisplayName is already exist");
+            throw new BackendServiceException(ErrorCode.USER_ALREADY_EXISTS);
         User user = User.builder()
                 .email(request.email())
                 .displayName(request.displayName())
@@ -44,6 +49,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ + "')")
     public PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest, String email, String displayName) {
         Pageable pageable = PageRequest.of(
                 pageRequest.getPageNumber() - 1,
@@ -64,8 +70,17 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ + "')")
     public UserDetailResponse getUserById(String userId) {
-        User user = userRepository.findById(userId).orElseThrow(() -> new RuntimeException("User is not exist!"));
+        User user = userRepository.findById(userId).orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+        return UserDetailResponse.of(user);
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public UserDetailResponse myInfo(String userId) {
+        User user = userRepository.findById(userId).orElseThrow(
+                () -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
         return UserDetailResponse.of(user);
     }
 }

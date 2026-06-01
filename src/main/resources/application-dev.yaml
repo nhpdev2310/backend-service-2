@@ -45,3 +45,4 @@ logging:
     org.hibernate.orm.jdbc.bind: TRACE
     org.hibernate.stat: DEBUG
     org.hibernate.orm.jdbc.batch: TRACE
+    com.nhpdev.backendservicesecond: DEBUG
