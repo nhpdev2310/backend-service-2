@@ -17,8 +17,9 @@ public enum ErrorCode {
     USER_NOT_FOUND("USER_001", HttpStatus.NOT_FOUND, "User not found"),
     USER_ALREADY_EXISTS("USER_002", HttpStatus.CONFLICT, "User already exists"),
     USER_DISABLED("USER_003", HttpStatus.FORBIDDEN, "User account is disabled"),
-    INVALID_CREDENTIALS("USER_004", HttpStatus.UNAUTHORIZED, "Invalid credentials"),
-    EMAIL_NOT_VERIFIED("USER_005", HttpStatus.FORBIDDEN, "Email not verified"),
+    USER_BANNED("USER_004", HttpStatus.FORBIDDEN, "User account is banned"),
+    INVALID_CREDENTIALS("USER_005", HttpStatus.UNAUTHORIZED, "Invalid credentials"),
+    EMAIL_NOT_VERIFIED("USER_006", HttpStatus.FORBIDDEN, "Email not verified"),
 
     // Role
     ROLE_NOT_FOUND("ROLE_001", HttpStatus.NOT_FOUND, "Role not found"),

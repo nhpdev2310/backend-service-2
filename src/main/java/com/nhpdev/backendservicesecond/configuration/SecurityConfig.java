@@ -40,7 +40,7 @@ public class SecurityConfig {
     private final NhpJWTDecoder jwtDecoder;
 
     @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
+    public SecurityFilterChain securityFilterChain(HttpSecurity http) {
         http.csrf(AbstractHttpConfigurer::disable)
             .authorizeHttpRequests(authorize -> authorize
                     .requestMatchers(HttpMethod.POST, PUBLIC_POST_ENDPOINTS).permitAll()

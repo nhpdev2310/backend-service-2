@@ -7,6 +7,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.authentication.DisabledException;
 import org.springframework.validation.FieldError;
 import org.springframework.web.HttpRequestMethodNotSupportedException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -52,6 +53,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ErrorResponse> handleAccessDeniedException(AccessDeniedException e, WebRequest request) {
         return buildErrorResponse(ErrorCode.FORBIDDEN, ErrorCode.FORBIDDEN.getMessage(), null, request);
+    }
+
+//    org.springframework.security.authentication.DisabledException:
+    @ExceptionHandler(DisabledException.class)
+    public ResponseEntity<ErrorResponse> handlerDisabledException(DisabledException e, WebRequest request) {
+        return buildErrorResponse(ErrorCode.USER_DISABLED, ErrorCode.USER_DISABLED.getMessage(), null, request);
     }
 
     /**

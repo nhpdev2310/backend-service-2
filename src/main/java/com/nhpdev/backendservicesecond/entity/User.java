@@ -1,6 +1,8 @@
 package com.nhpdev.backendservicesecond.entity;
 
 import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
+import com.nhpdev.backendservicesecond.exception.BackendServiceException;
+import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.core.GrantedAuthority;
@@ -85,6 +87,7 @@ public class User extends BaseEntity implements UserDetails {
 
     @Override
     public boolean isEnabled() {
-        return this.getStatus().equals(UserStatus.ACTIVE) && !this.isBanned;
+        if (this.isBanned) throw new BackendServiceException(ErrorCode.USER_BANNED);
+        return this.getStatus().equals(UserStatus.ACTIVE);
     }
 }
