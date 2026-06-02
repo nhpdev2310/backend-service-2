@@ -2,6 +2,8 @@ package com.nhpdev.backendservicesecond.service;
 
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
+import com.nhpdev.backendservicesecond.dto.request.UserStatusRequest;
+import com.nhpdev.backendservicesecond.dto.request.UserUpdateOwnRequest;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
 
@@ -11,4 +13,6 @@ public interface UserService {
                                                 String email, String displayName);
     UserDetailResponse getUserById(String userId);
     UserDetailResponse myInfo(String userId);
+    UserDetailResponse updateMyInfo(String userId, UserUpdateOwnRequest request);
+    UserDetailResponse updateUserStatus(String userId, UserStatusRequest request);
 }

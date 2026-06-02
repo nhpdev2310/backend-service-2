@@ -3,6 +3,8 @@ package com.nhpdev.backendservicesecond.controller;
 import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
+import com.nhpdev.backendservicesecond.dto.request.UserStatusRequest;
+import com.nhpdev.backendservicesecond.dto.request.UserUpdateOwnRequest;
 import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
@@ -44,6 +46,21 @@ public class UserController {
     public ApiResponse<UserDetailResponse> myInfo(@AuthenticationPrincipal Jwt jwt) {
         var userId = jwt.getSubject();
         var data = userService.myInfo(userId);
+        return ApiResponse.success(data);
+    }
+
+    @PatchMapping("/me")
+    public ApiResponse<UserDetailResponse> updateMyInfo(@AuthenticationPrincipal Jwt jwt,
+                                                        @RequestBody UserUpdateOwnRequest request) {
+        var userId = jwt.getSubject();
+        var data = userService.updateMyInfo(userId, request);
+        return ApiResponse.success(data);
+    }
+
+    @PatchMapping("/{id}/status")
+    public ApiResponse<UserDetailResponse> updateStatus(@PathVariable("id") String userId,
+                                                            @RequestBody UserStatusRequest request){
+        var data = userService.updateUserStatus(userId, request);
         return ApiResponse.success(data);
     }
 }

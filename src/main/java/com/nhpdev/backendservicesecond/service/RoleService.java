@@ -1,11 +1,11 @@
 package com.nhpdev.backendservicesecond.service;
 
 
-import com.nhpdev.backendservicesecond.entity.Role;
+import com.nhpdev.backendservicesecond.dto.response.RoleDetailResponse;
 
 import java.util.Collection;
 import java.util.List;
 
 public interface RoleService {
-    List<Role> getAllPermissionByRoleNames(Collection<String> roleNames);
+    List<RoleDetailResponse> getAllPermissionByRoleNames(Collection<String> roleNames);
 }

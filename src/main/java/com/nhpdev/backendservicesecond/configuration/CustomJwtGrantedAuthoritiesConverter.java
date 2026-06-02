@@ -12,6 +12,7 @@ import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -33,7 +34,7 @@ public class CustomJwtGrantedAuthoritiesConverter implements Converter<Jwt, Coll
             return Collections.emptyList();
         }
         //DONE: Get all permission based on authorities
-        List<RoleDetailResponse> roleDetails = RoleDetailResponse.ofAll(roleService.getAllPermissionByRoleNames(roleNames));
+        List<RoleDetailResponse> roleDetails = roleService.getAllPermissionByRoleNames(roleNames);
         //DONE: Combine all of that at a grantedAuthorities in which ROLE go with the prefix "ROLE_"
         return roleDetails.stream().flatMap(rd -> {
             Stream<GrantedAuthority> roleStream = Stream.of(
@@ -41,6 +42,6 @@ public class CustomJwtGrantedAuthoritiesConverter implements Converter<Jwt, Coll
             Stream<GrantedAuthority> permissionStream = rd.getPermissions() == null ? Stream.empty()
                     : rd.getPermissions().stream().map(SimpleGrantedAuthority::new);
             return Stream.concat(roleStream, permissionStream);
-        }).collect(Collectors.toList());
+        }).collect(Collectors.toCollection(ArrayList::new));
     }
 }

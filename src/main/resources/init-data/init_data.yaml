@@ -7,23 +7,37 @@ init-data:
         - "role:update"
         - "permission:read"
         - "permission:update"
+        - "user:assign_role"
+        - "permission:assign"
+        - "post:delete_hard"
+        - "user:delete_hard"
 
     - name: "ADMIN"
       description: "Administrator - manage users only"
       permissions:
-        - "user:read"
+        - "user:read_any"
+        - "user:read_own"
         - "user:create"
-        - "user:update"
-        - "user:delete"
+        - "user:update_status"
+        - "user:delete_soft"
+        - "post:delete_soft_any"
 
     - name: "AUTHOR"
       description: "Author with content management access"
       permissions:
-
+        - "user:read_own"
+        - "user:update_own"
+        - "post:create"
+        - "post:update_own"
+        - "post:delete_soft_own"
+        - "post:read"
 
     - name: "MEMBER"
       description: "Member with read only access"
       permissions:
+        - "user:read_own"
+        - "user:update_own"
+        - "post:read"
 
 
   admin:

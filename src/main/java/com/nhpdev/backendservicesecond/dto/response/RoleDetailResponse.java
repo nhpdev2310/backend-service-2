@@ -6,7 +6,9 @@ import com.nhpdev.backendservicesecond.entity.Role;
 import com.nhpdev.backendservicesecond.entity.RolePermission;
 import lombok.*;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Getter
 @Setter
@@ -26,11 +28,12 @@ public class RoleDetailResponse {
                 .name(role.getName())
                 .permissions(role.getRolePermissions().stream()
                         .map(RolePermission::getPermission)
-                        .map(Permission::getName).toList())
+                        .map(Permission::getName).collect(Collectors.toCollection(ArrayList::new)))
                 .build();
     }
 
     public static List<RoleDetailResponse> ofAll(List<Role> roles) {
-        return roles.stream().map(RoleDetailResponse::of).toList();
+        return roles.stream().map(RoleDetailResponse::of)
+                .collect(Collectors.toCollection(ArrayList::new));
     }
 }

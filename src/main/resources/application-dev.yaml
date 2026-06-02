@@ -28,6 +28,12 @@ spring:
   output:
     ansi:
       enabled: always
+  cache:
+    type: redis
+    data:
+      redis:
+        host: localhost
+        port: 6379
 
 jwt:
   access_token:
@@ -46,3 +52,5 @@ logging:
     org.hibernate.stat: DEBUG
     org.hibernate.orm.jdbc.batch: TRACE
     com.nhpdev.backendservicesecond: DEBUG
+    org.springframework.cache: TRACE
+    org.springframework.data.redis: TRACE

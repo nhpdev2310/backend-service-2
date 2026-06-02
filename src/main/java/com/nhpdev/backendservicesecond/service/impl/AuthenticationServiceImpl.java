@@ -22,7 +22,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
 import java.text.ParseException;
-import java.util.Set;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
@@ -42,8 +42,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
         if (!(authenticate.getPrincipal() instanceof User user)) {
             throw new BackendServiceException(ErrorCode.USER_NOT_FOUND);
         }
-        Set<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                .collect(Collectors.toSet());
+        List<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                .collect(Collectors.toList());
         String accessToken = jwtService.generateAccessToken(user.getId(), authorities);
         String refreshToken = jwtService.generateRefreshToken(user.getId());
         return AuthenticationResponse.builder()
@@ -63,8 +63,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
             String userId = signedJWT.getJWTClaimsSet().getSubject();
             User user = userRepository.findById(userId).
                     orElseThrow(() -> new BackendServiceException(ErrorCode.TOKEN_INVALID));
-            Set<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
-                    .collect(Collectors.toSet());
+            List<String> authorities = user.getAuthorities().stream().map(GrantedAuthority::getAuthority)
+                    .collect(Collectors.toList());
             String newAccessToken = jwtService.generateAccessToken(userId, authorities);
             String newRefreshToken = jwtService.generateRefreshToken(userId);
             return AuthenticationResponse.builder()
