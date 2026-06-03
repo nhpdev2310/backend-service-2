@@ -1,6 +1,5 @@
 package com.nhpdev.backendservicesecond.service.impl;
 
-import com.nhpdev.backendservicesecond.entity.User;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;

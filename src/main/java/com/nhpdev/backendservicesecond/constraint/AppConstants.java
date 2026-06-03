@@ -9,6 +9,6 @@ public final class AppConstants {
     public static final int DEFAULT_SIZE = 5;
 
     public static final String URL_PREFIX = "/api/v1";
-
+    public static final String HOST = "http://localhost:8080";
     public static final String DEFAULT_SORT = "createdAt";
 }

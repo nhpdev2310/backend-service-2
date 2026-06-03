@@ -2,7 +2,6 @@ package com.nhpdev.backendservicesecond.configuration;
 
 import static com.nhpdev.backendservicesecond.constraint.RedisConstant.*;
 
-import com.nhpdev.backendservicesecond.constraint.RedisConstant;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cache.annotation.CachingConfigurer;
 import org.springframework.cache.annotation.EnableCaching;

@@ -12,20 +12,15 @@ import org.springframework.stereotype.Component;
 public class JwtConfig {
     private String issuer;
     private String audience;
-    private AccessToken accessToken;
-    private RefreshToken refreshToken;
+    private SecretKey accessToken;
+    private SecretKey refreshToken;
+    private SecretKey verificationToken;
 
     @Getter
     @Setter
-    public static class AccessToken {
+    public static class SecretKey {
         private String secret;
         private long expiration;
     }
 
-    @Getter
-    @Setter
-    public static class RefreshToken {
-        private String secret;
-        private long expiration;
-    }
 }

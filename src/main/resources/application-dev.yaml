@@ -35,6 +35,24 @@ spring:
         host: localhost
         port: 6379
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  threads:
+    virtual:
+      enabled: true
+
+
 jwt:
   access_token:
     secret: ${ACCESS_KEY}
@@ -42,6 +60,9 @@ jwt:
   refresh_token:
     secret: ${REFRESH_KEY}
     expiration: 14
+  verification_token:
+    secret: ${VERIFICATION_KEY}
+    expiration: 1
   issuer: http://localhost:8080
   audience: backend-service
 

@@ -11,7 +11,12 @@ public enum ErrorCode {
     FORBIDDEN("AUTH_002", HttpStatus.FORBIDDEN, "Access denied"),
     TOKEN_EXPIRED("AUTH_003", HttpStatus.UNAUTHORIZED, "Token has expired"),
     TOKEN_INVALID("AUTH_004", HttpStatus.UNAUTHORIZED, "Token is invalid"),
-    REFRESH_TOKEN_EXPIRED("AUTH_005", HttpStatus.UNAUTHORIZED, "Refresh token has expired"),
+    UNSUPPORTED_TOKEN_TYPE("TOKEN_005", HttpStatus.UNAUTHORIZED, "Unsupported token type"),
+    TOKEN_VERIFICATION_FAILED("TOKEN_006", HttpStatus.UNAUTHORIZED, "Token verification failed"),
+    REFRESH_TOKEN_EXPIRED("AUTH_007", HttpStatus.UNAUTHORIZED, "Refresh token has expired"),
+    TOKEN_GENERATION_FAILED("AUTH_008", HttpStatus.UNAUTHORIZED, "Token generate Failed"),
+    TOKEN_MISSING("AUTH_009", HttpStatus.UNAUTHORIZED, "Token missing"),
+    TOKEN_PARSE_FAILED("AUTH_010", HttpStatus.UNAUTHORIZED, "Token parse failed"),
 
     // User
     USER_NOT_FOUND("USER_001", HttpStatus.NOT_FOUND, "User not found"),
@@ -20,6 +25,7 @@ public enum ErrorCode {
     USER_BANNED("USER_004", HttpStatus.FORBIDDEN, "User account is banned"),
     INVALID_CREDENTIALS("USER_005", HttpStatus.UNAUTHORIZED, "Invalid credentials"),
     EMAIL_NOT_VERIFIED("USER_006", HttpStatus.FORBIDDEN, "Email not verified"),
+    USER_ALREADY_ACTIVATED("USER_007", HttpStatus.BAD_REQUEST, "User is already activated"),
 
     // Role
     ROLE_NOT_FOUND("ROLE_001", HttpStatus.NOT_FOUND, "Role not found"),

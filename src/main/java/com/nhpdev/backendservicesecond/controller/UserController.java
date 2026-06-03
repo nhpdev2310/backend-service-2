@@ -63,4 +63,10 @@ public class UserController {
         var data = userService.updateUserStatus(userId, request);
         return ApiResponse.success(data);
     }
+
+    @GetMapping("/verification/{token}")
+    public ApiResponse<Void> verifyAccount(@PathVariable("token") String verificationToken) {
+        userService.verfifyAccount(verificationToken);
+        return ApiResponse.noContent();
+    }
 }

@@ -31,10 +31,11 @@ public class SecurityConfig {
     private static final String[] PUBLIC_POST_ENDPOINTS = {
             URL_PREFIX + "/users",
             URL_PREFIX + "/auth/login",
-            URL_PREFIX + "/auth/refresh"
+            URL_PREFIX + "/auth/refresh",
     };
 
     private static final String[] PUBLIC_GET_ENDPOINTS = {
+            URL_PREFIX + "/users/verification/**"
     };
 
     private final NhpJWTDecoder jwtDecoder;

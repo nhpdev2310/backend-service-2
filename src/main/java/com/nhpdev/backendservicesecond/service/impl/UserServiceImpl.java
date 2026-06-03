@@ -1,7 +1,11 @@
 package com.nhpdev.backendservicesecond.service.impl;
 
 import com.nhpdev.backendservicesecond.common.PermissionCode;
+import com.nhpdev.backendservicesecond.common.nhpenum.TokenType;
 import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
+import static com.nhpdev.backendservicesecond.constraint.MailConstants.*;
+
+import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserStatusRequest;
@@ -13,8 +17,14 @@ import com.nhpdev.backendservicesecond.exception.BackendServiceException;
 import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.repository.specification.UserSpecification;
+import com.nhpdev.backendservicesecond.service.JwtService;
+import com.nhpdev.backendservicesecond.service.MailService;
 import com.nhpdev.backendservicesecond.service.UserService;
+import com.nimbusds.jwt.SignedJWT;
+import jakarta.validation.constraints.NotNull;
+import lombok.NonNull;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
@@ -26,14 +36,22 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
+
+import java.text.ParseException;
+
 import static com.nhpdev.backendservicesecond.constraint.RedisConstant.USER_DETAIL_LIST_CACHE;
 
 @Service
 @RequiredArgsConstructor
 @Transactional(readOnly = true)
+@Slf4j(topic = "USER_SERVICE")
 public class UserServiceImpl implements UserService {
+
     private final UserRepository userRepository;
+    private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
+    private final MailService mailService;
 
     @Override
     @Transactional
@@ -50,6 +68,9 @@ public class UserServiceImpl implements UserService {
                 .status(UserStatus.INACTIVE)
                 .build();
         User savedUser = userRepository.save(user);
+        String verificationLink = createVerificationLink(savedUser);
+        mailService.sendVerificationEmail(request.email(),
+                VERIFICATION_SUBJECT, request.displayName(), VERIFICATION_TEMP, verificationLink);
         return UserDetailResponse.of(savedUser);
     }
 
@@ -114,5 +135,36 @@ public class UserServiceImpl implements UserService {
         if(request.isBanned() != null) user.setBanned(request.isBanned());
         if(request.status() != null) user.setStatus(request.status());
         return UserDetailResponse.of(user);
+    }
+
+    @Override
+    @Transactional
+    @CacheEvict(value = USER_DETAIL_LIST_CACHE, allEntries = true)
+    public void verfifyAccount(String verifyToken) {
+        SignedJWT signedJWT = jwtService.validateToken(verifyToken, TokenType.VERIFICATION);
+        try {
+            String userId = signedJWT.getJWTClaimsSet().getSubject();
+            User user = userRepository.findById(userId)
+                    .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+            user.setStatus(UserStatus.ACTIVE);
+        } catch (ParseException e) {
+            throw new BackendServiceException(ErrorCode.TOKEN_PARSE_FAILED);
+        }
+    }
+
+    private String createVerificationLink(@NonNull User user) {
+        if (user.isEnabled()) {
+            log.warn("User {} is already activated. Aborting link generation.", user.getEmail());
+            throw new BackendServiceException(ErrorCode.USER_ALREADY_ACTIVATED);
+        }
+        String token = jwtService.generateVerificationToken(user.getId());
+        if (!StringUtils.hasText(token)) {
+            log.warn("Verification token is null, user: {}", user.getEmail());
+            throw new BackendServiceException(ErrorCode.INTERNAL_SERVER_ERROR);
+        }
+        return AppConstants.HOST +
+                AppConstants.URL_PREFIX +
+                "/users/verification/" +
+                token;
     }
 }

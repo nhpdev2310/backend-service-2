@@ -3,7 +3,6 @@ package com.nhpdev.backendservicesecond.dto.request;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
-import lombok.Builder;
 
 import static com.nhpdev.backendservicesecond.constraint.ValidationMessage.*;
 

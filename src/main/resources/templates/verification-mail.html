@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org" lang="vi">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Chào mừng bạn!</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700&family=DM+Sans:wght@400;500&display=swap');
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #f0ebe3;
+            font-family: 'DM Sans', sans-serif;
+            color: #1a1a1a;
+            padding: 40px 16px;
+        }
+
+        .wrapper {
+            max-width: 580px;
+            margin: 0 auto;
+        }
+
+        /* Header bar */
+        .top-bar {
+            background-color: #1a1a1a;
+            border-radius: 12px 12px 0 0;
+            padding: 20px 36px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .logo-text {
+            font-family: 'Playfair Display', serif;
+            font-size: 22px;
+            color: #f5e6c8;
+            letter-spacing: 0.5px;
+        }
+
+        .logo-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background-color: #e8a838;
+            margin-top: 4px;
+        }
+
+        /* Card body */
+        .card {
+            background-color: #ffffff;
+            padding: 48px 44px 40px;
+            border-left: 1px solid #e2ddd6;
+            border-right: 1px solid #e2ddd6;
+        }
+
+        .greeting-label {
+            font-size: 12px;
+            font-weight: 500;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            color: #e8a838;
+            margin-bottom: 14px;
+        }
+
+        .heading {
+            font-family: 'Playfair Display', serif;
+            font-size: 36px;
+            line-height: 1.2;
+            color: #1a1a1a;
+            margin-bottom: 6px;
+        }
+
+        .heading span {
+            color: #e8a838;
+        }
+
+        .divider {
+            width: 48px;
+            height: 3px;
+            background-color: #e8a838;
+            border-radius: 2px;
+            margin: 20px 0;
+        }
+
+        .body-text {
+            font-size: 15.5px;
+            line-height: 1.75;
+            color: #444;
+            margin-bottom: 14px;
+        }
+
+        /* CTA button */
+        .cta-wrapper {
+            margin: 32px 0 28px;
+        }
+
+        .cta-btn {
+            display: inline-block;
+            background-color: #1a1a1a;
+            color: #f5e6c8;
+            text-decoration: none;
+            font-family: 'DM Sans', sans-serif;
+            font-size: 14px;
+            font-weight: 500;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+            padding: 14px 32px;
+            border-radius: 6px;
+        }
+
+        /* Feature highlights */
+        .features {
+            display: flex;
+            gap: 0;
+            margin: 28px 0 0;
+            border-top: 1px solid #ece8e0;
+            padding-top: 28px;
+        }
+
+        .feature {
+            flex: 1;
+            padding: 0 16px 0 0;
+        }
+
+        .feature:last-child { padding-right: 0; }
+
+        .feature-icon {
+            font-size: 22px;
+            margin-bottom: 8px;
+        }
+
+        .feature-title {
+            font-size: 13px;
+            font-weight: 500;
+            letter-spacing: 0.5px;
+            color: #1a1a1a;
+            margin-bottom: 4px;
+        }
+
+        .feature-desc {
+            font-size: 12.5px;
+            color: #888;
+            line-height: 1.5;
+        }
+
+        /* Footer */
+        .footer {
+            background-color: #1a1a1a;
+            border-radius: 0 0 12px 12px;
+            padding: 24px 36px;
+            text-align: center;
+        }
+
+        .footer p {
+            font-size: 12px;
+            color: #888;
+            line-height: 1.7;
+        }
+
+        .footer a {
+            color: #e8a838;
+            text-decoration: none;
+        }
+    </style>
+</head>
+<body>
+<div class="wrapper">
+
+    <!-- Top bar -->
+    <div class="top-bar">
+        <span class="logo-text">The Beast Library</span>
+        <div class="logo-dot"></div>
+    </div>
+
+    <!-- Main card -->
+    <div class="card">
+        <p class="greeting-label">Chào mừng thành viên mới</p>
+
+        <h1 class="heading">
+            Xin chào, <span th:text="${displayName}">Người dùng</span>!
+        </h1>
+
+        <div class="divider"></div>
+
+        <p class="body-text">
+            Chúng tôi rất vui vì bạn đã đăng ký tài khoản tại <strong>The Beast Library</strong> —
+            kênh đọc truyện miễn phí, nhanh chóng và luôn được cập nhật.
+        </p>
+
+        <p class="body-text">
+            Để hoàn tất đăng ký và kích hoạt tài khoản, vui lòng xác minh địa chỉ email của bạn bằng cách nhấn vào nút bên dưới.
+        </p>
+
+        <div class="cta-wrapper">
+            <a th:href="${verificationUrl}" href="#" class="cta-btn">&#x2709; Xác minh tài khoản</a>
+        </div>
+
+        <p class="body-text" style="font-size: 13px; color: #999; margin-top: -10px;">
+            Link xác minh sẽ hết hạn sau <strong>24 giờ</strong>. Nếu bạn không thực hiện yêu cầu này, hãy bỏ qua email này.
+        </p>
+
+        <!-- Feature highlights -->
+        <div class="features">
+            <div class="feature">
+                <div class="feature-icon">📖</div>
+                <div class="feature-title">Miễn phí</div>
+                <div class="feature-desc">Đọc không giới hạn, không mất phí</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">⚡</div>
+                <div class="feature-title">Nhanh chóng</div>
+                <div class="feature-desc">Tải chương mới tức thì, không chờ đợi</div>
+            </div>
+            <div class="feature">
+                <div class="feature-icon">🔔</div>
+                <div class="feature-title">Luôn cập nhật</div>
+                <div class="feature-desc">Chương mới nhất luôn có mặt sớm nhất</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Footer -->
+    <div class="footer">
+        <p>
+            Bạn nhận được email này vì vừa đăng ký tài khoản tại The Beast Library.<br />
+            Nếu đây không phải bạn, vui lòng <a href="#">liên hệ chúng tôi</a>.<br /><br />
+            © 2026 The Beast Library · <a href="#">Chính sách bảo mật</a> · <a href="#">Hủy đăng ký</a>
+        </p>
+    </div>
+
+</div>
+</body>
+</html>

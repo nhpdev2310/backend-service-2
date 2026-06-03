@@ -11,7 +11,6 @@ import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.service.AuthenticationService;
 import com.nhpdev.backendservicesecond.service.JwtService;
-import com.nimbusds.jose.JOSEException;
 import com.nimbusds.jwt.SignedJWT;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -71,8 +70,8 @@ public class AuthenticationServiceImpl implements AuthenticationService {
                     .accessToken(newAccessToken)
                     .refreshToken(newRefreshToken)
                     .build();
-        } catch (ParseException | JOSEException e) {
-            throw new RuntimeException(e);
+        } catch (ParseException e) {
+            throw new BackendServiceException(ErrorCode.TOKEN_PARSE_FAILED);
         }
     }
 

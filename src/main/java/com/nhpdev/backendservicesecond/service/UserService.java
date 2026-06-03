@@ -15,4 +15,5 @@ public interface UserService {
     UserDetailResponse myInfo(String userId);
     UserDetailResponse updateMyInfo(String userId, UserUpdateOwnRequest request);
     UserDetailResponse updateUserStatus(String userId, UserStatusRequest request);
+    void verfifyAccount(String verifyToken);
 }
