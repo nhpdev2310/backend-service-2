@@ -19,6 +19,7 @@ import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.repository.specification.UserSpecification;
 import com.nhpdev.backendservicesecond.service.JwtService;
 import com.nhpdev.backendservicesecond.service.MailService;
+import com.nhpdev.backendservicesecond.service.TokenService;
 import com.nhpdev.backendservicesecond.service.UserService;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.validation.constraints.NotNull;
@@ -52,6 +53,7 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
+    private final TokenService tokenService;
 
     @Override
     @Transactional
@@ -141,15 +143,13 @@ public class UserServiceImpl implements UserService {
     @Transactional
     @CacheEvict(value = USER_DETAIL_LIST_CACHE, allEntries = true)
     public void verfifyAccount(String verifyToken) {
-        SignedJWT signedJWT = jwtService.validateToken(verifyToken, TokenType.VERIFICATION);
-        try {
-            String userId = signedJWT.getJWTClaimsSet().getSubject();
-            User user = userRepository.findById(userId)
-                    .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
-            user.setStatus(UserStatus.ACTIVE);
-        } catch (ParseException e) {
-            throw new BackendServiceException(ErrorCode.TOKEN_PARSE_FAILED);
+        String userId = tokenService.validateAndConsumeVerificationToken(verifyToken);
+        if(userId == null) {
+            throw new BackendServiceException(ErrorCode.TOKEN_EXPIRED);
         }
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+        user.setStatus(UserStatus.ACTIVE);
     }
 
     private String createVerificationLink(@NonNull User user) {
@@ -157,7 +157,7 @@ public class UserServiceImpl implements UserService {
             log.warn("User {} is already activated. Aborting link generation.", user.getEmail());
             throw new BackendServiceException(ErrorCode.USER_ALREADY_ACTIVATED);
         }
-        String token = jwtService.generateVerificationToken(user.getId());
+        String token = tokenService.createVerificationToken(user.getId());
         if (!StringUtils.hasText(token)) {
             log.warn("Verification token is null, user: {}", user.getEmail());
             throw new BackendServiceException(ErrorCode.INTERNAL_SERVER_ERROR);

@@ -2,9 +2,11 @@ package com.nhpdev.backendservicesecond.service.impl;
 
 import com.nhpdev.backendservicesecond.common.nhpenum.TokenType;
 import com.nhpdev.backendservicesecond.configuration.JwtConfig;
+import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.exception.BackendServiceException;
 import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.service.JwtService;
+import com.nhpdev.backendservicesecond.service.TokenService;
 import com.nimbusds.jose.*;
 import com.nimbusds.jose.crypto.MACSigner;
 import com.nimbusds.jose.crypto.MACVerifier;
@@ -37,21 +39,17 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String generateAccessToken(String userId, Collection<String> authorities) {
+    public String generateAccessToken(String userId, Collection<String> authorities, String sessionKey) {
         return signAndSerialize(userId, TokenType.ACCESS,
-                jwtConfig.getAccessToken().getExpiration(), ChronoUnit.DAYS, Map.of("authorities", authorities));
+                jwtConfig.getAccessToken().getExpiration(), ChronoUnit.MINUTES,
+                sessionKey, Map.of("authorities", authorities));
     }
 
     @Override
-    public String generateRefreshToken(String userId) {
+    public String generateRefreshToken(String userId, String sessionKey) {
         return signAndSerialize(userId, TokenType.REFRESH,
-                jwtConfig.getRefreshToken().getExpiration(), ChronoUnit.DAYS, Map.of());
-    }
-
-    @Override
-    public String generateVerificationToken(String userId) {
-        return signAndSerialize(userId, TokenType.VERIFICATION,
-                jwtConfig.getVerificationToken().getExpiration(), ChronoUnit.DAYS, Map.of());
+                jwtConfig.getRefreshToken().getExpiration(), ChronoUnit.DAYS,
+                sessionKey, Map.of());
     }
 
     @Override
@@ -97,11 +95,11 @@ public class JwtServiceImpl implements JwtService {
 
     private String signAndSerialize(String userId, TokenType tokenType,
                                     long expirationDuration, ChronoUnit unit,
-                                    Map<String, Object> customClaims
-                                    ) {
+                                    String sessionKey, Map<String, Object> customClaims) {
 
         Date issueTime = new Date();
         Date expirationTime = Date.from(issueTime.toInstant().plus(expirationDuration, unit));
+
         JWTClaimsSet.Builder claimsBuilder = new JWTClaimsSet.Builder()
                 .subject(userId)
                 .issuer(jwtConfig.getIssuer())
@@ -109,6 +107,11 @@ public class JwtServiceImpl implements JwtService {
                 .expirationTime(expirationTime)
                 .audience(jwtConfig.getAudience())
                 .jwtID(UUID.randomUUID().toString());
+
+        if (sessionKey != null && !sessionKey.isBlank()) {
+            claimsBuilder.claim(AppConstants.SESSION_KEY_CLAIM, sessionKey);
+        }
+
         customClaims.forEach(claimsBuilder::claim);
         JWTClaimsSet claimsSet = claimsBuilder.build();
         JWSHeader header = new JWSHeader.Builder(JWSAlgorithm.HS256)

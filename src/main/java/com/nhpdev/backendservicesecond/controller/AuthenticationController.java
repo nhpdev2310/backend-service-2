@@ -2,6 +2,7 @@ package com.nhpdev.backendservicesecond.controller;
 
 import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.configuration.JwtConfig;
+import com.nhpdev.backendservicesecond.constraint.JwtConstants;
 import com.nhpdev.backendservicesecond.dto.request.AuthenticationRequest;
 import com.nhpdev.backendservicesecond.dto.response.ApiResponse;
 import com.nhpdev.backendservicesecond.dto.response.AuthenticationResponse;
@@ -44,9 +45,23 @@ public class AuthenticationController {
         return ApiResponse.success(LoginResponse.of(data));
     }
 
+    @PostMapping("/logout")
+    public ApiResponse<Void> logout(@RequestHeader("Authorization") String authorizationHeader,
+                                    HttpServletResponse response) {
+        String accessToken = authorizationHeader.replace(JwtConstants.BEARER_PREFIX, "");
+        authService.logout(accessToken);
+        ResponseCookie clearCookie = ResponseCookie.from("refresh_token", "")
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(0)
+                .build();
+        response.addHeader(HttpHeaders.SET_COOKIE, clearCookie.toString());
+        return ApiResponse.noContent();
+    }
+
     private @NonNull ResponseCookie getResponseCookie(AuthenticationResponse data) {
         return ResponseCookie.from("refresh_token", data.getRefreshToken())
-//                .domain("localhost")
                 .path("/")
                 .httpOnly(true)
                 .secure(false)

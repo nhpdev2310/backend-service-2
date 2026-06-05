@@ -2,8 +2,11 @@ package com.nhpdev.backendservicesecond.security;
 
 import com.nhpdev.backendservicesecond.constraint.JwtConstants;
 import com.nhpdev.backendservicesecond.configuration.JwtConfig;
+import com.nhpdev.backendservicesecond.security.validator.JwtRedisValidator;
+import com.nhpdev.backendservicesecond.service.TokenService;
 import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.oauth2.core.OAuth2TokenValidator;
 import org.springframework.security.oauth2.jose.jws.MacAlgorithm;
 import org.springframework.security.oauth2.jwt.*;
 import org.springframework.stereotype.Component;
@@ -17,6 +20,7 @@ import java.nio.charset.StandardCharsets;
 public class NhpJWTDecoder implements JwtDecoder {
 
     private NimbusJwtDecoder nimbusJwtDecoder;
+    private final TokenService tokenService;
     private final JwtConfig jwtConfig;
 
     @PostConstruct
@@ -29,12 +33,12 @@ public class NhpJWTDecoder implements JwtDecoder {
                 .withSecretKey(secretKey)
                 .macAlgorithm(MacAlgorithm.HS256)
                 .build();
-        this.nimbusJwtDecoder.setJwtValidator(
-                JwtValidators.createDefaultWithValidators(
-                        new JwtIssuerValidator(jwtConfig.getIssuer()),
-                        new JwtAudienceValidator(jwtConfig.getAudience())
-                )
+        OAuth2TokenValidator<Jwt> combinedValidator = JwtValidators.createDefaultWithValidators(
+                new JwtIssuerValidator(jwtConfig.getIssuer()),
+                new JwtAudienceValidator(jwtConfig.getAudience()),
+                new JwtRedisValidator(tokenService)
         );
+        this.nimbusJwtDecoder.setJwtValidator(combinedValidator);
     }
 
     @Override

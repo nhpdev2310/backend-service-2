@@ -62,7 +62,7 @@ jwt:
     expiration: 14
   verification_token:
     secret: ${VERIFICATION_KEY}
-    expiration: 1
+    expiration: 15
   issuer: http://localhost:8080
   audience: backend-service
 
