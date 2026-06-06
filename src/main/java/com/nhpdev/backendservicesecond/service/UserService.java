@@ -6,6 +6,7 @@ import com.nhpdev.backendservicesecond.dto.request.UserStatusRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserUpdateOwnRequest;
 import com.nhpdev.backendservicesecond.dto.response.PageResponse;
 import com.nhpdev.backendservicesecond.dto.response.UserDetailResponse;
+import org.springframework.web.multipart.MultipartFile;
 
 public interface UserService {
     UserDetailResponse createUser(UserCreateRequest request);
@@ -16,4 +17,7 @@ public interface UserService {
     UserDetailResponse updateMyInfo(String userId, UserUpdateOwnRequest request);
     UserDetailResponse updateUserStatus(String userId, UserStatusRequest request);
     void verfifyAccount(String verifyToken);
+    void uploadAvatar(String userId, MultipartFile image);
+    String getMyAvatar(String userId);
+    String getUserAvatar(String userId);
 }

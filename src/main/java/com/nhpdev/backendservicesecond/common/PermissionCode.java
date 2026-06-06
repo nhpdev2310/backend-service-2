@@ -3,11 +3,9 @@ package com.nhpdev.backendservicesecond.common;
 public final class PermissionCode {
     private PermissionCode() {}
     // User
-    public static final String USER_READ_ANY = "user:read_any";
-    public static final String USER_READ_OWN = "user:read_own";
+    public static final String USER_READ = "user:read";
     public static final String USER_CREATE = "user:create";
-    public static final String USER_UPDATE_OWN = "user:update_own";
-    public static final String USER_UPDATE_STATUS = "user:update_status";
+    public static final String USER_UPDATE = "user:update";
     public static final String USER_ASSIGN_ROLE = "user:assign_role";
     public static final String USER_DELETE_HARD = "user:delete_hard";
     public static final String USER_DELETE_SOFT = "user:delete_soft";

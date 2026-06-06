@@ -31,6 +31,9 @@ public class User extends BaseEntity implements UserDetails {
     @Column(name = "display_name", nullable = false, unique = true)
     private String displayName;
 
+    @Column(name = "avatar_key", nullable = true)
+    private String avatarKey;
+
     @Column(columnDefinition = "TEXT")
     private String bio;
 
@@ -45,6 +48,7 @@ public class User extends BaseEntity implements UserDetails {
     @Builder.Default
     @Column(nullable = false)
     private boolean isBanned = false;
+
 
     @Builder.Default
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL, orphanRemoval = true)

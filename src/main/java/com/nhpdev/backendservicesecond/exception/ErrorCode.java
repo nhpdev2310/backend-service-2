@@ -42,6 +42,9 @@ public enum ErrorCode {
     INVALID_EMAIL("VAL_004", HttpStatus.BAD_REQUEST, "Invalid email"),
     INVALID_PASSWORD("VAL_005", HttpStatus.BAD_REQUEST, "Invalid password"),
 
+    // Media
+    UPLOAD_FILE_FAILED("SYS_005", HttpStatus.INTERNAL_SERVER_ERROR, "Failed to upload file"),
+
     // System
     INTERNAL_SERVER_ERROR("SYS_001", HttpStatus.INTERNAL_SERVER_ERROR, "Internal server error"),
     SERVICE_UNAVAILABLE("SYS_002", HttpStatus.SERVICE_UNAVAILABLE, "Service unavailable"),

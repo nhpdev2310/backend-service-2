@@ -5,6 +5,7 @@ import com.nhpdev.backendservicesecond.common.nhpenum.TokenType;
 import com.nhpdev.backendservicesecond.common.nhpenum.UserStatus;
 import static com.nhpdev.backendservicesecond.constraint.MailConstants.*;
 
+import com.nhpdev.backendservicesecond.constraint.AWSConstants;
 import com.nhpdev.backendservicesecond.constraint.AppConstants;
 import com.nhpdev.backendservicesecond.dto.request.PaginationRequest;
 import com.nhpdev.backendservicesecond.dto.request.UserCreateRequest;
@@ -17,10 +18,7 @@ import com.nhpdev.backendservicesecond.exception.BackendServiceException;
 import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.repository.UserRepository;
 import com.nhpdev.backendservicesecond.repository.specification.UserSpecification;
-import com.nhpdev.backendservicesecond.service.JwtService;
-import com.nhpdev.backendservicesecond.service.MailService;
-import com.nhpdev.backendservicesecond.service.TokenService;
-import com.nhpdev.backendservicesecond.service.UserService;
+import com.nhpdev.backendservicesecond.service.*;
 import com.nimbusds.jwt.SignedJWT;
 import jakarta.validation.constraints.NotNull;
 import lombok.NonNull;
@@ -38,7 +36,9 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
 import java.text.ParseException;
 
 import static com.nhpdev.backendservicesecond.constraint.RedisConstant.USER_DETAIL_LIST_CACHE;
@@ -54,6 +54,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final MailService mailService;
     private final TokenService tokenService;
+    private final MediaService mediaService;
 
     @Override
     @Transactional
@@ -77,7 +78,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ_ANY + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ + "')")
     @Cacheable(value = USER_DETAIL_LIST_CACHE, key = "'page:' + #pageRequest.pageNumber + 'size:' + #pageRequest.pageSize + ':q:' + #email + ':' + #displayName")
     public PageResponse<UserDetailResponse> getAllUser(PaginationRequest pageRequest,
                                                        String email, String displayName) {
@@ -100,7 +101,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ_ANY + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ + "')")
     public UserDetailResponse getUserById(String userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
@@ -108,7 +109,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated() and #userId == principal.subject")
+    @PreAuthorize("isAuthenticated()")
     public UserDetailResponse myInfo(String userId) {
         User user = userRepository.findById(userId).orElseThrow(
                 () -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
@@ -116,7 +117,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("isAuthenticated() and #userId == principal.subject")
+    @PreAuthorize("isAuthenticated()")
     @Transactional
     @CacheEvict(value = USER_DETAIL_LIST_CACHE, allEntries = true)
     public UserDetailResponse updateMyInfo(String userId, UserUpdateOwnRequest request) {
@@ -128,7 +129,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @PreAuthorize("hasAuthority('" + PermissionCode.USER_UPDATE_STATUS + "')")
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_UPDATE + "')")
     @Transactional
     @CacheEvict(value = USER_DETAIL_LIST_CACHE, allEntries = true)
     public UserDetailResponse updateUserStatus(String userId, UserStatusRequest request) {
@@ -151,6 +152,45 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
         user.setStatus(UserStatus.ACTIVE);
     }
+
+    @Override
+    @Transactional
+    @PreAuthorize("isAuthenticated()")
+    public void uploadAvatar(String userId, MultipartFile image) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+        try {
+            String key = mediaService.uploadMedia(image, AWSConstants.AVATARS);
+            user.setAvatarKey(key);
+        } catch (IOException e) {
+            log.warn("failed to upload avatar", e);
+            throw new BackendServiceException(ErrorCode.UPLOAD_FILE_FAILED);
+        }
+    }
+
+    @Override
+    @PreAuthorize("isAuthenticated()")
+    public String getMyAvatar(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+        String avatarKey = user.getAvatarKey();
+        if (!StringUtils.hasText(avatarKey))
+            return "";
+        return mediaService.generatePresignedUrl(avatarKey);
+    }
+
+    @Override
+    @PreAuthorize("hasAuthority('" + PermissionCode.USER_READ + "') " +
+            "or (isAuthenticated() and #userId == authentication.principal.subject)")
+    public String getUserAvatar(String userId) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new BackendServiceException(ErrorCode.USER_NOT_FOUND));
+        String avatarKey = user.getAvatarKey();
+        if (!StringUtils.hasText(avatarKey))
+            return "";
+        return mediaService.generatePresignedUrl(avatarKey);
+    }
+
 
     private String createVerificationLink(@NonNull User user) {
         if (user.isEnabled()) {

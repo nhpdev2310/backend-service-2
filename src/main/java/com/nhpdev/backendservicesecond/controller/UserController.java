@@ -14,6 +14,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -54,6 +55,27 @@ public class UserController {
                                                         @RequestBody UserUpdateOwnRequest request) {
         var userId = jwt.getSubject();
         var data = userService.updateMyInfo(userId, request);
+        return ApiResponse.success(data);
+    }
+
+    @PatchMapping("/me/avatar")
+    public ApiResponse<Void> updateMyAvatar(@AuthenticationPrincipal Jwt jwt,
+                                            @RequestParam MultipartFile image) {
+        var userId = jwt.getSubject();
+        userService.uploadAvatar(userId, image);
+        return ApiResponse.noContent();
+    }
+
+    @GetMapping("/me/avatar")
+    public ApiResponse<String> myAvatar(@AuthenticationPrincipal Jwt jwt) {
+        var userId = jwt.getSubject();
+        var data = userService.getMyAvatar(userId);
+        return ApiResponse.success(data);
+    }
+
+    @GetMapping("/{id}/avatar")
+    public ApiResponse<String> getUserAvatar(@PathVariable("id") String userId) {
+        var data = userService.getUserAvatar(userId);
         return ApiResponse.success(data);
     }
 

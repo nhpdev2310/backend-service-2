@@ -15,18 +15,16 @@ init-data:
     - name: "ADMIN"
       description: "Administrator - manage users only"
       permissions:
-        - "user:read_any"
+        - "user:read"
         - "user:read_own"
         - "user:create"
-        - "user:update_status"
+        - "user:update"
         - "user:delete_soft"
         - "post:delete_soft_any"
 
     - name: "AUTHOR"
       description: "Author with content management access"
       permissions:
-        - "user:read_own"
-        - "user:update_own"
         - "post:create"
         - "post:update_own"
         - "post:delete_soft_own"
@@ -35,8 +33,6 @@ init-data:
     - name: "MEMBER"
       description: "Member with read only access"
       permissions:
-        - "user:read_own"
-        - "user:update_own"
         - "post:read"
 
 
