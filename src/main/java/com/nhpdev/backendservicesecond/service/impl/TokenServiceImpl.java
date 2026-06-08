@@ -69,6 +69,7 @@ public class TokenServiceImpl implements TokenService {
     /**
      * @param userId
      */
+    @Override
     public void removeAllRefreshTokensOfUser(String userId) {
         String patten = WHITELIST_REFRESH_PREFIX + userId + ":*";
         stringRedisTemplate.execute((RedisCallback<Void>) connection -> {

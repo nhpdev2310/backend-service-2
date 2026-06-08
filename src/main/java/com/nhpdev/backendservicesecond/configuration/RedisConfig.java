@@ -26,10 +26,10 @@ import java.util.Map;
 @EnableCaching
 public class RedisConfig implements CachingConfigurer {
 
-    @Value("${spring.cache.data.redis.host}")
+    @Value("${spring.data.redis.host}")
     private String host;
 
-    @Value("${spring.cache.data.redis.port}")
+    @Value("${spring.data.redis.port}")
     private int port;
 
     @Bean

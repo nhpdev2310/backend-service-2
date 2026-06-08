@@ -33,8 +33,7 @@ public class JwtServiceImpl implements JwtService {
     public void init() {
         this.tokenSecretMap = Map.of(
                 TokenType.ACCESS, jwtConfig.getAccessToken().getSecret(),
-                TokenType.REFRESH, jwtConfig.getRefreshToken().getSecret(),
-                TokenType.VERIFICATION, jwtConfig.getVerificationToken().getSecret()
+                TokenType.REFRESH, jwtConfig.getRefreshToken().getSecret()
         );
     }
 

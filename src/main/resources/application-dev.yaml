@@ -1,5 +1,5 @@
 server:
-  port: 8080
+  port: 8181
 
 spring:
   config:
@@ -8,9 +8,9 @@ spring:
       - classpath:init-data/init_data.yaml
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DATABASE_HOST:localhost}:${DATABASE_PORT:5432}/${DATABASE_NAME:backend-service}?TimeZone=UTC
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -30,10 +30,10 @@ spring:
       enabled: always
   cache:
     type: redis
-    data:
-      redis:
-        host: localhost
-        port: 6379
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
 
   mail:
     host: smtp.gmail.com
@@ -55,15 +55,12 @@ spring:
 
 jwt:
   access_token:
-    secret: ${ACCESS_KEY}
+    secret: ${JWT_ACCESS_KEY}
     expiration: 1
   refresh_token:
-    secret: ${REFRESH_KEY}
+    secret: ${JWT_REFRESH_KEY}
     expiration: 14
-  verification_token:
-    secret: ${VERIFICATION_KEY}
-    expiration: 15
-  issuer: http://localhost:8080
+  issuer: ${JWT_ISSUER:http://localhost:8080}
   audience: backend-service
 
 aws:

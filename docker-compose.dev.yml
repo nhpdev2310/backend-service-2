@@ -2,12 +2,14 @@ services:
   postgres:
     image: postgres:18.4
     container_name: postgres
+    ports:
+      - "5433:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin@123
       POSTGRES_DB: backend-service
     volumes:
-      - postgres_data:/var/lib/postgresql
+      - postgres_data:/var/lib/postgresql/data
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d backend-service"]
       interval: 10s
@@ -20,23 +22,25 @@ services:
   redis:
     image: redis:8.6
     container_name: redis
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
     healthcheck:
       test: ["CMD", "redis-cli", "ping"]
-      interval: 10s 
+      interval: 10s
       timeout: 5s
       retries: 5
       start_period: 10s
     networks:
       - nhp_network
 
-  backend-service:
+  backend_service:
     image: nhpdev2310/backend-service:1.2
     container_name: backend-service
     env_file:
-      - .env
+      - .env.dev
     ports:
       - "8080:8080"
     restart: unless-stopped

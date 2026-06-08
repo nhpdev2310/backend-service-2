@@ -14,7 +14,6 @@ public class JwtConfig {
     private String audience;
     private SecretKey accessToken;
     private SecretKey refreshToken;
-    private SecretKey verificationToken;
 
     @Getter
     @Setter

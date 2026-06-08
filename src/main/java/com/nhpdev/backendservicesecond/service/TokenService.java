@@ -4,8 +4,8 @@ import java.util.Date;
 import java.util.concurrent.TimeUnit;
 
 public interface TokenService {
-    void saveRefreshTokenJti(String userId, String jti, String deviceId, long duration, TimeUnit unit);
-    boolean isValidRefreshToken(String userId, String deviceId, String requestJti);
+    void saveRefreshTokenJti(String userId, String jti, String sessionKey, long duration, TimeUnit unit);
+    boolean isValidRefreshToken(String userId, String sessionKey, String requestJti);
     void removeRefreshTokenOnSession(String userId, String sessionKey);
     void blackListAccessToken(String jti, long remainingTime, TimeUnit unit);
     boolean isAccessTokenBlackListed(String jti);

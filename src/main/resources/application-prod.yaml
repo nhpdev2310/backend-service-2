@@ -1,29 +1,80 @@
 server:
-  port: 9090
+  port: 8080
 
 spring:
   config:
-    import: optional:file:.env.prod[.properties]
+    import:
+      - optional:file:.env[.properties]
+      - classpath:init-data/init_data.yaml
 
   datasource:
-    url: ${DB_URL}
-    username: ${DB_USERNAME}
-    password: ${DB_PASSWORD}
+    url: jdbc:postgresql://${DATABASE_HOST:postgres}:${DATABASE_PORT:5432}/${DATABASE_NAME:backend-service}?TimeZone=UTC
+    username: ${DATABASE_USERNAME}
+    password: ${DATABASE_PASSWORD}
     driver-class-name: org.postgresql.Driver
 
   jpa:
     hibernate:
-      ddl-auto: create-drop
+      ddl-auto: update
     properties:
       hibernate:
         format_sql: true
         jdbc:
           time_zone: UTC
+          batch_size: 30
+        order_inserts: true
+        order_updates: true
+        generate_statistics: true
   output:
     ansi:
       enabled: always
+  cache:
+    type: redis
+  data:
+    redis:
+      host: ${REDIS_HOST:redis}
+      port: ${REDIS_PORT:6379}
+
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    properties:
+      mail:
+        transport:
+          protocol: smtp
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+  threads:
+    virtual:
+      enabled: true
+
+
+jwt:
+  access_token:
+    secret: ${JWT_ACCESS_KEY}
+    expiration: 15
+  refresh_token:
+    secret: ${JWT_REFRESH_KEY}
+    expiration: 14
+  issuer: ${JWT_ISSUER:http://localhost:8080}
+  audience: backend-service
+
+aws:
+  access-key-id: ${AWS_ACCESS_KEY}
+  secret-key-id: ${AWS_SECRET_KEY}
+  region: ap-southeast-1
+  bucket-name: nhpdev-media-2
 
 logging:
   level:
     org.hibernate.SQL: DEBUG
     org.hibernate.orm.jdbc.bind: TRACE
+    org.hibernate.stat: DEBUG
+    org.hibernate.orm.jdbc.batch: TRACE
+    com.nhpdev.backendservicesecond: DEBUG
+    org.springframework.cache: TRACE
+    org.springframework.data.redis: TRACE
