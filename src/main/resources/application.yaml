@@ -1,5 +1,8 @@
 kind: Application
 spring:
+  config:
+    import:
+      - optional:file:.env[.properties]
   application:
     name: backend-service-second
   profiles:
