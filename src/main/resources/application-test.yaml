@@ -13,9 +13,13 @@ spring:
 
 jwt:
   access_token:
-    secret: P4ZYyX8Iw2sBVFN8DtDEqa9AlCli1MxFTZzH4fxd1Vk
+    secret: EemfBfDnPeFzfxk7zDi7p004rnbjkLY1GN29ZLazL+8=
+    expiration: 15
   refresh_token:
-    secret: P4ZYyX8Iw2sBVFN8DtDEqa9AlCli1MxFTZzH4fxd1Vk
+    secret: EemfBfDnPeFzfxk7zDi7p004rnbjkLY1GN29ZLazL+8=
+    expiration: 14
+  issuer: http://localhost:8080
+  audience: backend-service
 
 aws:
   access-key-id: dummy-aws-key
