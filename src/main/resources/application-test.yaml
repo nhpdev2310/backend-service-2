@@ -1,0 +1,22 @@
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb?TimeZone=UTC
+    username: testuser
+    password: testpassword
+  data:
+    redis:
+      host: localhost
+      port: 6379
+  mail:
+    username: dummy-test@localhost
+    password: dummy-password
+
+jwt:
+  access_token:
+    secret: P4ZYyX8Iw2sBVFN8DtDEqa9AlCli1MxFTZzH4fxd1Vk
+  refresh_token:
+    secret: P4ZYyX8Iw2sBVFN8DtDEqa9AlCli1MxFTZzH4fxd1Vk
+
+aws:
+  access-key-id: ""
+  secret-key: ""

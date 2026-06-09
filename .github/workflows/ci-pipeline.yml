@@ -64,15 +64,6 @@ jobs:
 
       - name: Run tests (Unit Test & Integration Test)
         run: mvn test
-        env:
-          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
-          DATABASE_HOST: localhost
-          DATABASE_PORT: 5432
-          DATABASE_NAME: testdb
-          DATABASE_USERNAME: testuser
-          DATABASE_PASSWORD: testpassword
-          REDIS_HOST: localhost
-          REDIS_PORT: 6379
 
       - name: Build with Maven
         run: mvn package -DskipTests
