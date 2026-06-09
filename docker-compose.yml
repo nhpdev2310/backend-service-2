@@ -2,6 +2,8 @@ services:
   postgres:
     image: postgres:18.4
     container_name: postgres
+    ports:
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin@123
@@ -20,6 +22,8 @@ services:
   redis:
     image: redis:8.6
     container_name: redis
+    ports:
+      - "6379:6379"
     volumes:
       - redis_data:/data
     command: redis-server --appendonly yes
@@ -33,7 +37,7 @@ services:
       - nhp_network
 
   backend-service:
-    image: nhpdev2310/backend-service:1.2
+    image: nhpdev2310/backend-service:1.4
     container_name: backend-service
     env_file:
       - .env

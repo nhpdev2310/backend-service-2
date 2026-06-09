@@ -4,6 +4,8 @@ import static com.nhpdev.backendservicesecond.constraint.RedisConstant.*;
 import static com.nhpdev.backendservicesecond.constraint.AppConstants.*;
 
 import com.nhpdev.backendservicesecond.configuration.JwtConfig;
+import com.nhpdev.backendservicesecond.exception.BackendServiceException;
+import com.nhpdev.backendservicesecond.exception.ErrorCode;
 import com.nhpdev.backendservicesecond.service.TokenService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -165,13 +167,15 @@ public class TokenServiceImpl implements TokenService {
     @Override
     public String validateAndConsumeVerificationToken(String token) {
         String key = VERIFY_EMAIL_PREFIX + token;
-        String userId = stringRedisTemplate.opsForValue().get(key);
-        if(userId != null) {
-            stringRedisTemplate.delete(key);
-            stringRedisTemplate.hasKey(key);
-            return userId;
+
+        String userId = stringRedisTemplate.opsForValue().getAndDelete(key);
+
+        if (userId == null) {
+            log.warn("Invalid or expired verification token used: {}", token);
+            throw new BackendServiceException(ErrorCode.TOKEN_VERIFICATION_FAILED);
         }
-        log.warn("Invalid or expired verification token used: {}", token);
-        return null;
+
+        log.info("Verification token consumed for userId: {}", userId);
+        return userId;
     }
 }

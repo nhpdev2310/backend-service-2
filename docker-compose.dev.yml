@@ -3,13 +3,13 @@ services:
     image: postgres:18.4
     container_name: postgres
     ports:
-      - "5433:5432"
+      - "5432:5432"
     environment:
       POSTGRES_USER: postgres
       POSTGRES_PASSWORD: admin@123
       POSTGRES_DB: backend-service
     volumes:
-      - postgres_data:/var/lib/postgresql/data
+      - postgres_data:/var/lib/postgresql
     healthcheck:
       test: ["CMD-SHELL", "pg_isready -U postgres -d backend-service"]
       interval: 10s
@@ -17,7 +17,7 @@ services:
       retries: 5
       start_period: 30s
     networks:
-      - nhp_network
+      - dev_network
 
   redis:
     image: redis:8.6
@@ -34,27 +34,27 @@ services:
       retries: 5
       start_period: 10s
     networks:
-      - nhp_network
+      - dev_network
 
-  backend_service:
-    image: nhpdev2310/backend-service:1.2
-    container_name: backend-service
-    env_file:
-      - .env.dev
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-    depends_on:
-      postgres:
-        condition: service_healthy
-      redis:
-        condition: service_healthy
-    networks:
-      - nhp_network
+#  backend_service:
+#    image: nhpdev2310/backend-service:1.4
+#    container_name: backend-service
+#    env_file:
+#      - .env.dev
+#    ports:
+#      - "8080:8080"
+#    restart: unless-stopped
+#    depends_on:
+#      postgres:
+#        condition: service_healthy
+#      redis:
+#        condition: service_healthy
+#    networks:
+#      - dev_network
 
 volumes:
   postgres_data:
   redis_data:
 networks:
-  nhp_network:
+  dev_network:
     driver: bridge
