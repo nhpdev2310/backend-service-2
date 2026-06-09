@@ -18,5 +18,6 @@ jwt:
     secret: P4ZYyX8Iw2sBVFN8DtDEqa9AlCli1MxFTZzH4fxd1Vk
 
 aws:
-  access-key-id: ""
-  secret-key: ""
+  access-key-id: dummy-aws-key
+  secret-key: dummy-aws-secret
+  region: ap-southeast-1
