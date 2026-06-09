@@ -18,6 +18,31 @@ jobs:
       contents: read      # GITHUB_TOKEN chỉ được đọc code
     timeout-minutes: 20   # tự fail sau 20 phút nếu bị treo
 
+    services:
+      postgres:
+        image: postgres:18.4
+        env:
+          POSTGRES_DB: testdb
+          POSTGRES_USER: testuser
+          POSTGRES_PASSWORD: testpassword
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8.6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
     steps:
       # --- GIAI ĐOẠN 1: KHỞI TẠO & THÔNG TIN ---
       - name: Log Trigger Info
@@ -39,6 +64,15 @@ jobs:
 
       - name: Run tests (Unit Test & Integration Test)
         run: mvn test
+        env:
+          SPRING_DATASOURCE_URL: jdbc:postgresql://localhost:5432/testdb
+          DATABASE_HOST: localhost
+          DATABASE_PORT: 5432
+          DATABASE_NAME: testdb
+          DATABASE_USERNAME: testuser
+          DATABASE_PASSWORD: testpassword
+          REDIS_HOST: localhost
+          REDIS_PORT: 6379
 
       - name: Build with Maven
         run: mvn package -DskipTests
