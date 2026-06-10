@@ -3,28 +3,36 @@ run-name: Build & Test by ${{ github.actor }}
 
 on:
   push:
-    branches:
-      - master
-      - main
+    branches: [ "main", "master" ]
   pull_request:
-    branches:
-      - master
-      - main
+    branches: [ "main", "master" ]
+
+env:
+  JAVA_VERSION: '21'
+  JAVA_DISTRIBUTION: 'temurin'
+  POSTGRES_DB: 'testdb'
+  POSTGRES_USER: 'testuser'
+  POSTGRES_PASSWORD: 'testpassword'
+  ARTIFACT_PATH: 'target'
+  ARTIFACT_FILENAME: 'backend-service'
 
 jobs:
-  ci-pipeline:
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 1: KIỂM THỬ VÀ ĐÓNG GÓI ỨNG DỤNG (JAVA/MAVEN)
+  # ─────────────────────────────────────────────────────────────────
+  test-and-package:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-    timeout-minutes: 20
+    timeout-minutes: 15
 
     services:
       postgres:
         image: postgres:18.4
         env:
-          POSTGRES_DB: testdb
-          POSTGRES_USER: testuser
-          POSTGRES_PASSWORD: testpassword
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
         ports:
           - 5432:5432
         options: >-
@@ -50,15 +58,70 @@ jobs:
       - name: Setup Java 21
         uses: actions/setup-java@v5
         with:
-          distribution: 'temurin'
-          java-version: '21'
+          distribution: ${{env.JAVA_DISTRIBUTION}}
+          java-version: ${{env.JAVA_VERSION}}
           cache: 'maven'
 
       - name: Run tests (Unit Test & Integration Test)
         run: mvn test
 
-      - name: Build with Maven
+      - name: Build Package (JAR)
         run: mvn package -DskipTests
+
+      # Lưu lại file JAR vừa build làm tư liệu để truyền sang Job sau
+      - name: Upload Build Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: ${{env.ARTIFACT_FILENAME}}
+          path: ${{env.ARTIFACT_PATH}}/*.jar
+          retention-days: 1
+
+  # ─────────────────────────────────────────────────────────────────
+  # JOB 2: ĐÓNG GÓI DOCKER, SMOKE TEST VÀ PUSH IMAGE
+  # ─────────────────────────────────────────────────────────────────
+  docker-smoke-and-push:
+    runs-on: ubuntu-latest
+    needs: test-and-package # Ràng buộc: Chỉ chạy khi Job 1 thành công
+    permissions:
+      contents: read
+    timeout-minutes: 15
+
+    # Smoke Test chạy giả lập container thật nên vẫn cần các service này để kết nối
+    services:
+      postgres:
+        image: postgres:18.4
+        env:
+          POSTGRES_DB: ${{env.POSTGRES_DB}}
+          POSTGRES_USER: ${{env.POSTGRES_USER}}
+          POSTGRES_PASSWORD: ${{env.POSTGRES_PASSWORD}}
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+      redis:
+        image: redis:8.6
+        ports:
+          - 6379:6379
+        options: >-
+          --health-cmd "redis-cli ping"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v6
+
+      # Tải file JAR đã build ở Job 1 xuống để build Docker (tránh build lại từ đầu)
+      - name: Download Build Artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: ${{env.ARTIFACT_FILENAME}}
+          path: ${{env.ARTIFACT_PATH}}/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v4
@@ -88,12 +151,11 @@ jobs:
             --network host \
             -e SPRING_PROFILES_ACTIVE=test \
             -e SERVER_PORT=8080 \
-            -e MANAGEMENT_SERVER_PORT=8080 \
             -e DATABASE_HOST=127.0.0.1 \
             -e DATABASE_PORT=5432 \
-            -e DATABASE_NAME=testdb \
-            -e DATABASE_USERNAME=testuser \
-            -e DATABASE_PASSWORD=testpassword \
+            -e DATABASE_NAME=${{env.POSTGRES_DB}} \
+            -e DATABASE_USERNAME=${{env.POSTGRES_USER}} \
+            -e DATABASE_PASSWORD=${{env.POSTGRES_PASSWORD}} \
             -e REDIS_HOST=127.0.0.1 \
             -e REDIS_PORT=6379 \
             -e EMAIL_USERNAME=dummy@localhost \
@@ -106,13 +168,13 @@ jobs:
           
           echo "Waiting for application to start..."
           for i in {1..30}; do
-            # Lấy mã HTTP trả về từ server (ví dụ: 200, 401, 404...). Nếu server chết, nó trả về 000.
             HTTP_STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:8080/ || echo "000")
           
             if [ "$HTTP_STATUS" != "000" ] && [ "$HTTP_STATUS" != "" ]; then
               echo "✅ Application is UP and responding with HTTP Status: $HTTP_STATUS"
               exit 0
             fi
+            echo "Trying to start the application"
             sleep 2
           done
           
@@ -120,13 +182,16 @@ jobs:
           docker logs test-app
           exit 1
 
-      - name: Cleanup
+      - name: Cleanup Container
         if: always()
         run: docker stop test-app 2>/dev/null || true && docker rm test-app 2>/dev/null || true
 
+      - name: Set short SHA
+        run: echo "SHORT_SHA=${GITHUB_SHA::7}" >> $GITHUB_ENV
+
       - name: Push verified image
         run: |
-          docker tag backend-service:candidate \
-            ${{ secrets.DOCKER_USERNAME }}/backend-service:${{ github.sha }}
-          docker push \
-            ${{ secrets.DOCKER_USERNAME }}/backend-service:${{ github.sha }}
+          docker tag backend-service:candidate ${{ secrets.DOCKER_USERNAME }}/backend-service:${{ env.SHORT_SHA }}
+          docker tag backend-service:candidate ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend-service:${{ env.SHORT_SHA }}
+          docker push ${{ secrets.DOCKER_USERNAME }}/backend-service:latest
