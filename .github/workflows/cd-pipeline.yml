@@ -1,0 +1,57 @@
+name: Continuous Deployment Pipeline
+run-name: ${{github.actor}}
+on:
+  workflow_run:
+    workflows:
+      - Continuous Integration Pipeline (Production Ready)
+    types:
+      - completed
+    branches:
+      - main
+      - master
+# Enforce least privilege for the runner token
+permissions:
+  id-token: write
+  contents: read
+# Prevent race conditions by canceling in-progress runs on the same branch
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  cd-pipeline:
+    runs-on: ubuntu-latest
+    if: ${{github.event.workflow_run.conclusion == 'success'}}
+
+    steps:
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1
+        with:
+          host: ${{ secrets.SSH_HOST }}
+          username: ${{ secrets.SSH_USERNAME }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          port: 22
+          script: |
+            echo "Start deploying to EC2..."
+            cd /home/ubuntu
+            
+            # 1. Cắt lấy 7 ký tự đầu tiên của mã SHA cho khớp với CI
+            FULL_SHA="${{ github.event.workflow_run.head_sha }}"
+            SHORT_SHA="${FULL_SHA:0:7}"
+            echo "Deploying version: $SHORT_SHA"
+            
+            # 2. Xóa dòng IMAGE_TAG cũ (nếu có) và thêm dòng mới vào cuối file .env để không làm mất dữ liệu cũ
+            sudo sed -i '/^IMAGE_TAG=/d' .env
+            echo "IMAGE_TAG=$SHORT_SHA" | sudo tee -a .env
+            
+            # 3. Kéo và chạy container
+            sudo docker compose pull backend-service
+            sudo docker compose up -d --force-recreate backend-service
+            
+            # 4. Dọn dẹp rác
+            sudo docker image prune -f
+            echo "
+            ==============================
+            Deploying to EC2 successfully!
+            ==============================
+            "
