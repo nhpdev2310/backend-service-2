@@ -1,0 +1,46 @@
+# BẢN CHUẨN: src/test/resources/application-test.yml
+spring:
+  datasource:
+    url: jdbc:postgresql://localhost:5432/testdb?TimeZone=UTC
+    username: testuser
+    password: testpassword
+    driver-class-name: org.postgresql.Driver
+
+  data:
+    redis:
+      host: localhost
+      port: 6379
+
+  # Bổ sung đẩy đủ cấu hình Mail để Spring không ném lỗi JavaMailSender
+  mail:
+    host: localhost
+    port: 25
+    username: dummy-test@localhost
+    password: dummy-password
+
+  # Vô hiệu hóa cache ảo (nếu có) để tránh lỗi không mong muốn khi test
+  cache:
+    type: none
+
+jwt:
+  # Cung cấp đầy đủ cả secret, thời gian, issuer và audience để pass SecurityConfig
+  access_token:
+    secret: 979yfsMrpmKlGC9/ER6S7UmFDu4H/G9kiGDG6LWsAMI=
+    expiration: 15
+  refresh_token:
+    secret: 979yfsMrpmKlGC9/ER6S7UmFDu4H/G9kiGDG6LWsAMI=
+    expiration: 14
+  issuer: http://localhost:8080
+  audience: backend-service
+
+aws:
+  # Cung cấp đầy đủ 4 biến để pass AWSConfiguration và MediaController
+  access-key-id: dummy-aws-key
+  secret-key: dummy-aws-secret
+  region: ap-southeast-1
+  bucket-name: dummy-bucket-for-testing
+
+# Tắt bớt log không cần thiết trong lúc test để dễ đọc lỗi (nếu có)
+logging:
+  level:
+    root: INFO
